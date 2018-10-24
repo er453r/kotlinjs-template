@@ -1,0 +1,67 @@
+group = "com.er453r.kotlinjstest"
+version = "0.0.1"
+
+buildscript {
+    ext{
+        kotlin_version = '1.2.60'
+        main = 'app'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+apply plugin: 'kotlin2js'
+
+sourceSets {
+    main.kotlin.srcDirs += "src"
+}
+
+compileKotlin2Js {
+    kotlinOptions{
+        outputFile = "${buildDir}/js/${main}.js"
+        sourceMap = true
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib-js:$kotlin_version"
+}
+
+clean.doFirst() {
+    delete("${buildDir}")
+}
+
+build.doLast() {
+    // Copy kotlin.js and kotlin-meta.js from jar into web directory
+    configurations.compile.each { File file ->
+        copy {
+            includeEmptyDirs = false
+
+            from zipTree(file.absolutePath)
+            into "${buildDir}/js"
+            include { fileTreeElement ->
+                fileTreeElement.path.endsWith(".js") && !fileTreeElement.path.endsWith("meta.js")
+            }
+        }
+    }
+
+    copy {
+        includeEmptyDirs = false
+        from new File("res")
+        into "${buildDir}"
+    }
+
+    delete("${buildDir}/js/${main}")
+    delete("${buildDir}/js/${main}.meta.js")
+    delete("${buildDir}/kotlin")
+    delete("${buildDir}/libs")
+    delete("${buildDir}/tmp")
+}
