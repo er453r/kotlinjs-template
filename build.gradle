@@ -21,6 +21,8 @@ sourceSets {
 }
 
 compileKotlin2Js {
+    logger.lifecycle("Compiling kotlin files...")
+
     kotlinOptions{
         outputFile = "${buildDir}/js/${main}.js"
         sourceMap = true
@@ -36,11 +38,17 @@ dependencies {
 }
 
 clean.doFirst() {
+    logger.lifecycle("Cleaning build dir...")
+
     delete("${buildDir}")
 }
 
+build.dependsOn clean
+
 build.doLast() {
     // Copy kotlin.js and kotlin-meta.js from jar into web directory
+    logger.lifecycle("Copying kotlin runtime...")
+
     configurations.compile.each { File file ->
         copy {
             includeEmptyDirs = false
@@ -53,15 +61,19 @@ build.doLast() {
         }
     }
 
-    copy {
-        includeEmptyDirs = false
-        from new File("res")
-        into "${buildDir}"
-    }
+    logger.lifecycle("Cleaning up build dir...")
 
     delete("${buildDir}/js/${main}")
     delete("${buildDir}/js/${main}.meta.js")
     delete("${buildDir}/kotlin")
     delete("${buildDir}/libs")
     delete("${buildDir}/tmp")
+
+
+    logger.lifecycle("Copying resources...")
+
+    copy {
+        from "res"
+        into "${buildDir}"
+    }
 }

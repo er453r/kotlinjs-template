@@ -4,16 +4,10 @@ import kotlin.browser.document
 fun main(args: Array<String>) {
     println("hello derp!")
 
-    val header = document.createElement("h1") as HTMLHeadingElement
-
-    header.innerHTML = "dynamic lol"
-
     document.addEventListener("DOMContentLoaded", {
-        document.body?.appendChild(header)
-
         val header = document.createElement("h1") as HTMLHeadingElement
 
-        header.innerHTML = TestUtils().sayHello("DERP")
+        header.innerHTML = "LOLOLO"
 
         document.body?.appendChild(header)
     })
