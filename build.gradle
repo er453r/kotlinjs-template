@@ -24,6 +24,7 @@ buildscript {
 
 apply plugin: 'kotlin2js'
 apply plugin: 'org.jetbrains.kotlin.frontend'
+apply plugin: 'kotlin-dce-js'
 
 sourceSets {
     main.kotlin.srcDirs += "src"
@@ -32,7 +33,7 @@ sourceSets {
 
 compileKotlin2Js {
     kotlinOptions.sourceMap = true
-    kotlinOptions.moduleKind = 'commonjs'
+    kotlinOptions.moduleKind = 'commonjs' // this is required or kotlin std lib won't be included by webpack
 }
 
 kotlinFrontend {
@@ -40,11 +41,10 @@ kotlinFrontend {
 
     npm {
         dependency("kotlin", "$kotlin_version")
-        dependency "jspdf"
+        dependency "jquery"
 
-        devDependency "ts2kt"
-        devDependency "@types/jspdf"
-        devDependency "@types/jquery"
+        devDependency "ts2kt" // use this for inspiration - but roll your own mini-wrappers by hand - automatic ones are a mess
+        devDependency "@types/jquery" // use this for inspiration - but roll your own mini-wrappers by hand - automatic ones are a mess
     }
 
     webpackBundle {
@@ -53,7 +53,6 @@ kotlinFrontend {
         sourceMapEnabled = true
     }
 }
-
 
 repositories {
     jcenter()
@@ -72,7 +71,7 @@ clean.doFirst() {
 compileKotlin2Js.doFirst() {
     logger.lifecycle("Before kotlin build...")
 
-//    project.extensions.npm.dependencies.each {
+//    project.extensions.npm.dependencies.each { // just do not bother with this...
 //        println "Generating kotlin for ${it.name}"
 //
 //        fileTree('build').include("**/${it.name}/**/*.d.ts").each {File file ->

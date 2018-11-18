@@ -9,8 +9,8 @@ external class JQuery() {
     fun hide(number:Int):JQuery
 }
 
-fun main(args: Array<String>) {
-    println("hello derp!")
+fun main() {
+    println("hello derp 3!")
 
     document.addEventListener("DOMContentLoaded", {
         val header = document.createElement("h2") as HTMLHeadingElement
@@ -20,8 +20,5 @@ fun main(args: Array<String>) {
         document.body?.appendChild(header)
 
         JQuery(header).hide(5000)
-
-        JQuery("h1").hide(5000)
-
     })
 }
