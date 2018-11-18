@@ -2,14 +2,17 @@ group = "com.er453r.kotlinjstest"
 version = "0.0.1"
 
 buildscript {
-    ext{
-        kotlin_version = '1.3.0'
+    ext {
+        kotlin_version = '1.3.10'
         main = 'app'
     }
     repositories {
         jcenter()
         maven {
             url "https://dl.bintray.com/kotlin/kotlin-eap"
+        }
+        maven {
+            url "https://plugins.gradle.org/m2/"
         }
     }
     dependencies {
@@ -29,19 +32,24 @@ sourceSets {
 
 compileKotlin2Js {
     kotlinOptions.sourceMap = true
+    kotlinOptions.moduleKind = 'commonjs'
 }
 
 kotlinFrontend {
     sourceMaps = true
 
     npm {
-        dependency("kotlin", "1.3.0")
-        dependency "jquery"
+        dependency("kotlin", "$kotlin_version")
+        dependency "jspdf"
+
+        devDependency "ts2kt"
+        devDependency "@types/jspdf"
+        devDependency "@types/jquery"
     }
 
     webpackBundle {
         bundleName = "app"
-        mode = "development"
+        mode = "production"
         sourceMapEnabled = true
     }
 }
@@ -61,6 +69,20 @@ clean.doFirst() {
     delete("dist")
 }
 
+compileKotlin2Js.doFirst() {
+    logger.lifecycle("Before kotlin build...")
+
+//    project.extensions.npm.dependencies.each {
+//        println "Generating kotlin for ${it.name}"
+//
+//        fileTree('build').include("**/${it.name}/**/*.d.ts").each {File file ->
+//            exec{
+//                commandLine "npx", "ts2kt", "-d", "src/", file.absolutePath
+//            }
+//        }
+//    }
+}
+
 build.doLast() {
     logger.lifecycle("Copying to dist...")
 
@@ -78,6 +100,5 @@ build.doLast() {
     copy {
         from file("build/bundle/app.bundle.js.map")
         into "dist/js"
-        rename { 'app.js.map' }
     }
 }
